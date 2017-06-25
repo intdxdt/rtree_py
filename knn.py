@@ -5,15 +5,6 @@ from collections import namedtuple
 QObj = namedtuple('QObj', ('dist', 'node', 'leaf'))
 
 
-def bbox(o):
-	if isinstance(o, (tuple, list)):
-		return o
-	try:
-		bx = o.bounds
-	except:
-		bx = tuple(o.bbox)
-	return bx
-
 
 def KNN(tree, query, limit, score, predicate):
 	node = tree.data

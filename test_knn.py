@@ -12,8 +12,19 @@ rtree_path = os.path.join(os.path.dirname(__file__), '../')
 sys.path.append(rtree_path)
 
 import unittest
-from  knn import bbox
+
 from _rtree import RTree
+
+
+def bbox(o):
+    if isinstance(o, (tuple, list)):
+        return o
+    try:
+        bx = o.bounds
+    except:
+        bx = tuple(o.bbox)
+    return bx
+
 
 def init_knn_data():
     return [[87, 55, 87, 56], [38, 13, 39, 16], [7, 47, 8, 47], [89, 9, 91, 12], [4, 58, 5, 60], [0, 11, 1, 12],

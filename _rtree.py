@@ -12,7 +12,7 @@ import json
 import math
 from _mbr import empty
 from node import Node
-from knn import KNN, bbox
+from knn import KNN
 
 MinX, MinY, MaxX, MaxY = 0, 1, 2, 3
 
@@ -35,7 +35,7 @@ def _axis_dist(k, min_val, max_val):
 
 def _box_score_dist(defaultPt, child):
     x, y = defaultPt[0], defaultPt[1]
-    box = bbox(child)
+    box = child
     return math.hypot(
         _axis_dist(x, box[MinX], box[MaxX]),
         _axis_dist(y, box[MinY], box[MaxY]),
