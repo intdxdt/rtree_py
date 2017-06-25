@@ -1,25 +1,8 @@
-from collections import namedtuple
-from _heap import Heap
 from node import Node
-from shapely.geometry import Polygon
+from _heap import Heap
+from collections import namedtuple
 
 QObj = namedtuple('QObj', ('dist', 'node', 'leaf'))
-
-
-def poly_box(obj):
-	"""
-	(x1,y2)              (x2,y2)
-		   __|_________|__
-			 |         |
-			 |         |
-		   __|_________|__
-			 |         |
-	 (x1,y1)             (x2,y1)
-	"""
-	o = bbox(obj)
-	x1, y1, x2, y2 = o[0], o[1], o[2], o[3]
-	pgeom = Polygon(((x1, y1), (x1, y2), (x2, y2), (x2, y1)))
-	return pgeom
 
 
 def bbox(o):
@@ -32,7 +15,7 @@ def bbox(o):
 	return bx
 
 
-def KNN(tree, query, limit, scoreFn, predicate):
+def KNN(tree, query, limit, score, predicate):
 	node = tree.data
 	result = []
 	queue = Heap()
@@ -40,11 +23,10 @@ def KNN(tree, query, limit, scoreFn, predicate):
 
 	while node and (not stop):
 		for child in node.children:
-			if not isinstance(child, Node):
-				dist = scoreFn(query, child)
+			if isinstance(child, Node):
+				dist = score(query, child.bbox)
 			else:
-				dist = scoreFn(query, poly_box(child))
-			# print gbox
+				dist = score(query, child)
 			o = QObj(dist, child, node.leaf)
 			queue.push(o)
 

@@ -188,12 +188,8 @@ class RTree(object):
 
         return self
 
-    def knn(self, gobj, limit, score_func=_box_score_dist, predicate=_knn_predicate):
-        return KNN(
-            self, gobj, limit,
-            scoreFn=score_func,
-            predicate=predicate,
-        )
+    def knn(self, gobj, limit, score=_box_score_dist, predicate=_knn_predicate):
+        return KNN(self, gobj, limit, score=score, predicate=predicate)
 
     def _init_format(self, attribute):
         def _diff(attr):

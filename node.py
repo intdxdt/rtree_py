@@ -1,12 +1,10 @@
 __author__ = 'titus'
 from _mbr import empty
 
-
 class Node(dict):
 	"""
 	BST - Node
 	"""
-
 	def __init__(self, **kw):
 		dict.__init__(self, kw)
 		self.__dict__ = self
