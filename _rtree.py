@@ -210,7 +210,7 @@ class RTree(object):
 
     def _condense(self, path):
         # go through the path, removing empty nodes and updating bboxes
-        for i in (len(path) - 1, 0 - 1, -1):
+        for i in xrange(len(path) - 1, 0 - 1, -1):
             if len(path[i].children) == 0:
                 if i > 0:
                     siblings = path[i - 1].children
