@@ -1,5 +1,5 @@
-Inf = float("inf")
-NegInf = float("-inf")
+Infinity = float("inf")
+NegInfinity = float("-inf")
 
 def empty():
-    return [Inf, Inf, NegInf, NegInf]
+    return [Infinity, Infinity, NegInfinity, NegInfinity]

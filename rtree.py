@@ -252,7 +252,7 @@ class RTree(object):
 
     def _chooseSplitIndex(self, node, m, M):
         minOverlap = minArea = float("inf")
-        index = None
+        index = -1
         for i in range(m, (M - m) + 1):
             bbox1 = distBBox(node, 0, i, self.toBBox)
             bbox2 = distBBox(node, i, M, self.toBBox)
@@ -272,6 +272,9 @@ class RTree(object):
                 if area < minArea:
                     minArea = area
                     index = i
+
+        if index < 0:
+            return M - m
         return index
 
     # sorts node children by the best axis for split
@@ -390,7 +393,7 @@ def _chooseSubtree(bbox, node, level, path):
         if node.leaf or (len(path) - 1 == level):
             break
 
-        targetNode = Node(children=[])
+        targetNode = None
         minArea = minEnlargement = float("inf")
 
         for i in range(node.size):
@@ -409,7 +412,7 @@ def _chooseSubtree(bbox, node, level, path):
                 if area < minArea:
                     minArea, targetNode = area, child
 
-        node = targetNode
+        node = targetNode or node.children[0]
 
     return node
 

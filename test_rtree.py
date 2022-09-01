@@ -4,6 +4,8 @@ import os
 import sys
 import unittest
 import random
+
+from box import Infinity, NegInfinity
 from rtree import RTree
 
 true = True
@@ -61,6 +63,10 @@ data = [[0, 0, 0, 0], [10, 10, 10, 10], [20, 20, 20, 20], [25, 0, 25, 0], [35, 1
         [70, 70, 70, 70], [75, 50, 75, 50],
         [85, 60, 85, 60], [95, 70, 95, 70], [50, 75, 50, 75], [60, 85, 60, 85], [70, 95, 70, 95], [75, 75, 75, 75],
         [85, 85, 85, 85], [95, 95, 95, 95]]
+
+emptyData = [[NegInfinity, NegInfinity, Infinity, Infinity], [NegInfinity, NegInfinity, Infinity, Infinity],
+             [NegInfinity, NegInfinity, Infinity, Infinity], [NegInfinity, NegInfinity, Infinity, Infinity],
+             [NegInfinity, NegInfinity, Infinity, Infinity], [NegInfinity, NegInfinity, Infinity, Infinity]]
 
 testTree = {
     "children": [
@@ -209,6 +215,22 @@ class TestRTree(unittest.TestCase):
         """load does nothing if loading empty data"""
         tree = rtree().load([])
         self.assertEqual(tree.json, rtree().json)
+
+    def test_load_empty_boxes(self):
+        """load handles the insertion of maxEntries + 2 empty bboxes"""
+        tree = rtree(4).load(emptyData)
+        self.assertEqual(tree.data.height, 2)
+        sortedEqual(self, tree.all(), emptyData, compare)
+
+    def test_insert_empty_boxes(self):
+        """load handles the insertion of maxEntries + 2 empty bboxes"""
+        tree = rtree(4)
+        for datum in emptyData:
+            tree.insert(datum)
+        self.assertEqual(tree.data.height, 2)
+        sortedEqual(self, tree.all(), emptyData, compare)
+        self.assertEqual(len(tree.data.children[0].children), 4)
+        self.assertEqual(len(tree.data.children[1].children), 2)
 
     def test_merge_split(self):
         """load properly splits tree root when merging trees of the same height"""
