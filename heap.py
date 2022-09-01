@@ -26,4 +26,4 @@ class Heap(object):
 if __name__ == '__main__':
 	hq = Heap([1, 2, 3, 4, 5, 6, 7])
 	while not hq.is_empty():
-		print hq.pop()
+		print (hq.pop())

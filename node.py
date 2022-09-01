@@ -1,42 +1,57 @@
 __author__ = 'titus'
-from _mbr import empty
+
+from box import empty
+
 
 class Node(dict):
-	"""
-	BST - Node
-	"""
-	def __init__(self, **kw):
-		dict.__init__(self, kw)
-		self.__dict__ = self
+    """
+    BST - Node
+    """
 
-		if not self.has_key('leaf'):
-			self.leaf = False
+    def __init__(self, **kw):
+        dict.__init__(self, kw)
+        self.__dict__ = self
 
-		if not self.has_key('children'):
-			self.children = []
+        if 'leaf' not in self:
+            self.leaf = False
 
-		if not self.has_key('height'):
-			self.height = 1
+        if 'children' not in self:
+            self.children = []
 
-		if not self.has_key('bbox'):
-			self.bbox = empty()
+        if 'height' not in self:
+            self.height = 1
 
-	def __getstate__(self):
-		return self
+        if 'bbox' not in self:
+            self.bbox = empty()
 
-	def __setstate__(self, state):
-		self.update(state)
-		self.__dict__ = self
+    def __getstate__(self):
+        return self
 
-	def __getattr__(self, item):
-		# only gets called if key is missing
-		if not self.__dict__.has_key(item):
-			raise Exception("invalid attribute")
-			# return getattr(self, item)
+    def __setstate__(self, state):
+        self.update(state)
+        self.__dict__ = self
 
-	def hasattr(self, attr):
-		return self.__dict__.has_key(attr)
+    def __getattr__(self, item):
+        # only gets called if key is missing
+        if item not in self.__dict__:
+            raise Exception("invalid attribute")
+        # return getattr(self, item)
 
-	@property
-	def size(self):
-		return len(self.children)
+    def __lt__(self, other):
+        return 0
+
+    def __le__(self, other):
+        return 0
+
+    def __gt__(self, other):
+        return 0
+
+    def __ge__(self, other):
+        return 0
+
+    def hasattr(self, attr):
+        return attr in self.__dict__
+
+    @property
+    def size(self):
+        return len(self.children)

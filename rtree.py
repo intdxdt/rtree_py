@@ -1,5 +1,7 @@
 __author__ = 'titus'
 
+import functools
+
 """
 Author : Titus Tienaah  - 2015
 @after Vladimir Agafonkin - 2013
@@ -10,7 +12,7 @@ Author : Titus Tienaah  - 2015
 
 import json
 import math
-from _mbr import empty
+from box import empty
 from node import Node
 from knn import KNN
 
@@ -140,7 +142,7 @@ class RTree(object):
         nodesToSearch = []
 
         while node:
-            for i in xrange(len(node.children)):
+            for i in range(len(node.children)):
                 child = node.children[i]
                 childBBox = self.toBBox(child) if node.leaf else child.bbox
 
@@ -159,7 +161,7 @@ class RTree(object):
             return self
 
         if len(data) < self.minEntries:
-            for i in xrange(len(data)):
+            for i in range(len(data)):
                 self.insert(data[i])
 
             return self
@@ -210,7 +212,7 @@ class RTree(object):
 
     def _condense(self, path):
         # go through the path, removing empty nodes and updating bboxes
-        for i in xrange(len(path) - 1, 0 - 1, -1):
+        for i in range(len(path) - 1, 0 - 1, -1):
             if len(path[i].children) == 0:
                 if i > 0:
                     siblings = path[i - 1].children
@@ -251,7 +253,7 @@ class RTree(object):
     def _chooseSplitIndex(self, node, m, M):
         minOverlap = minArea = float("inf")
         index = None
-        for i in xrange(m, (M - m) + 1):
+        for i in range(m, (M - m) + 1):
             bbox1 = distBBox(node, 0, i, self.toBBox)
             bbox2 = distBBox(node, i, M, self.toBBox)
 
@@ -283,23 +285,23 @@ class RTree(object):
         # if total distributions margin value is minimal for x, sort by minX,
         # otherwise it's already sorted by minY
         if xMargin < yMargin:
-            node.children.sort(compareMinX)
+            node.children.sort(key=functools.cmp_to_key(compareMinX))
 
     # total margin of all possible split distributions where each node is at least m full
     def _allDistMargin(self, node, m, M, compare):
-        node.children.sort(compare)
+        node.children.sort(key=functools.cmp_to_key(compare))
 
         leftBBox = distBBox(node, 0, m, self.toBBox)
         rightBBox = distBBox(node, M - m, M, self.toBBox)
 
         margin = bboxMargin(leftBBox) + bboxMargin(rightBBox)
 
-        for i in xrange(m, M - m):
+        for i in range(m, M - m):
             child = node.children[i]
-            extend(leftBBox, self.toBBox(child) if node.leaf  else child.bbox)
+            extend(leftBBox, self.toBBox(child) if node.leaf else child.bbox)
             margin += bboxMargin(leftBBox)
 
-        for i in xrange(M - m - 1, m - 1, -1):  # M-m-1 to m
+        for i in range(M - m - 1, m - 1, -1):  # M-m-1 to m
             child = node.children[i]
             extend(rightBBox, self.toBBox(child) if node.leaf else child.bbox)
             margin += bboxMargin(rightBBox)
@@ -351,11 +353,11 @@ class RTree(object):
         return node
 
     def _insert(self, item, level, isNode=False):
-        bbox = item.bbox if isNode  else self.toBBox(item)
-        insertPath = []
+        bbox = item.bbox if isNode else self.toBBox(item)
+        insert_path = []
 
         # find the best node for accommodating the item, saving all nodes along the path too
-        node = _chooseSubtree(bbox, self.data, level, insertPath)
+        node = _chooseSubtree(bbox, self.data, level, insert_path)
 
         # put the item into the node
         node.children.append(item)
@@ -363,14 +365,14 @@ class RTree(object):
 
         # split on node overflow propagate upwards if necessary
         while level >= 0:
-            if len(insertPath[level].children) > self.maxEntries:
-                self._split(insertPath, level)
+            if len(insert_path[level].children) > self.maxEntries:
+                self._split(insert_path, level)
                 level -= 1
             else:
                 break
 
         # adjust bboxes along the insertion path
-        _adjustParentBBoxes(bbox, insertPath, level)
+        _adjustParentBBoxes(bbox, insert_path, level)
 
 
 def _chooseSubtree(bbox, node, level, path):
@@ -391,7 +393,7 @@ def _chooseSubtree(bbox, node, level, path):
         targetNode = Node(children=[])
         minArea = minEnlargement = float("inf")
 
-        for i in xrange(node.size):
+        for i in range(node.size):
             child = node.children[i]
             area = bboxArea(child.bbox)
             enlargement = enlargedArea(bbox, child.bbox) - area
@@ -420,7 +422,7 @@ def _adjustParentBBoxes(bbox, path, level):
     :param level:
     :return:
     """
-    for i in xrange(level, 0 - 1, -1):
+    for i in range(level, 0 - 1, -1):
         extend(path[i].bbox, bbox)
 
 
@@ -440,59 +442,27 @@ def toBBox(item):
 
 
 def compareMinX(a, b):
-    """
-    compare min x
-    :param a:
-    :param b:
-    :return:
-    """
     return comparator(a[0], b[0])
 
 
 def compareMinY(a, b):
-    """
-    compare min y
-    :param a:
-    :param b:
-    :return:
-    """
     return comparator(a[1], b[1])
 
 
 def calcBBox(node, toBBox):
-    """
-    calculate node's bbox from bboxes of its children
-    :param node:
-    :param toBBox:
-    :return:
-    """
     node.bbox = distBBox(node, 0, node.size, toBBox)
 
 
 def distBBox(node, k, p, toBBox):
-    """
-    min bounding rectangle of node children from k to p-1
-    :param node:
-    :param k:
-    :param p:
-    :param toBBox:
-    :return:
-    """
     bbox = empty()
 
-    for i in xrange(k, p):
+    for i in range(k, p):
         child = node.children[i]
         extend(bbox, toBBox(child) if node.leaf else child.bbox)
     return bbox
 
 
 def extend(a, b):
-    """
-    extend
-    :param a:
-    :param b:
-    :return:
-    """
     a[0] = min(a[0], b[0])
     a[1] = min(a[1], b[1])
     a[2] = max(a[2], b[2])
@@ -501,32 +471,14 @@ def extend(a, b):
 
 
 def compareNodeMinX(a, b):
-    """
-    compare min x
-    :param a:
-    :param b:
-    :return:
-    """
     return comparator(a.bbox[0], b.bbox[0])
 
 
 def compareNodeMinY(a, b):
-    """
-    compare min y
-    :param a:
-    :param b:
-    :return:
-    """
     return comparator(a.bbox[1], b.bbox[1])
 
 
 def comparator(x, y):
-    """
-    default comparator
-    :param x:
-    :param y:
-    :return:
-    """
     if x < y:
         return -1
     elif x > y:
@@ -535,30 +487,14 @@ def comparator(x, y):
 
 
 def bboxArea(a):
-    """
-    box area
-    :param a:
-    :return:
-    """
     return (a[2] - a[0]) * (a[3] - a[1])
 
 
 def bboxMargin(a):
-    """
-    box margin
-    :param a:
-    :return:
-    """
     return (a[2] - a[0]) + (a[3] - a[1])
 
 
 def enlargedArea(a, b):
-    """
-    enlarge area
-    :param a:
-    :param b:
-    :return:
-    """
     mx2 = b[2] if b[2] > a[2] else a[2]
     mx3 = b[3] if b[3] > a[3] else a[3]
 
@@ -568,24 +504,12 @@ def enlargedArea(a, b):
 
 
 def intersectionArea(a, b):
-    """
-    intersect area
-    :param a:
-    :param b:
-    :return:
-    """
     minX, minY, maxX, maxY = max(a[0], b[0]), max(a[1], b[1]), \
                              min(a[2], b[2]), min(a[3], b[3])
     return max(0, maxX - minX) * max(0, maxY - minY)
 
 
 def contains(a, b):
-    """
-    contains
-    :param a:
-    :param b:
-    :return:
-    """
     return a[0] <= b[0] and \
            a[1] <= b[1] and \
            b[2] <= a[2] and \
@@ -593,12 +517,6 @@ def contains(a, b):
 
 
 def intersects(a, b):
-    """
-    intersects
-    :param a:
-    :param b:
-    :return:
-    """
     return b[0] <= a[2] and \
            b[1] <= a[3] and \
            b[2] >= a[0] and \
@@ -649,9 +567,9 @@ def select(arr, left, right, k, compare):
             z = math.log(n)
             s = 0.5 * math.exp(2 * z / 3.0)
             sd = 0.5 * math.sqrt(z * s * (n - s) / n) * (-1 if i - n / 2.0 < 0 else 1)
-            newLeft = int(max(left, math.floor(k - i * s / n + sd)))
-            newRight = int(min(right, math.floor(k + (n - i) * s / n + sd)))
-            select(arr, newLeft, newRight, k, compare)
+            new_left = int(max(left, math.floor(k - i * s / n + sd)))
+            new_right = int(min(right, math.floor(k + (n - i) * s / n + sd)))
+            select(arr, new_left, new_right, k, compare)
 
         t = arr[k]
         i = left
@@ -686,11 +604,4 @@ def select(arr, left, right, k, compare):
 
 
 def swap(arr, i, j):
-    """
-    swap
-    :param arr:
-    :param i:
-    :param j:
-    :return:
-    """
     arr[i], arr[j] = arr[j], arr[i]

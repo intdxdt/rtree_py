@@ -1,1 +1,1 @@
-from _rtree import  *
+from rtree import  *

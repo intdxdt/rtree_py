@@ -5,15 +5,14 @@ base, _ = os.path.split(os.path.realpath(__file__))
 base = os.path.abspath(os.path.join(base, "../"))
 sys.path.insert(0, base)
 
-# mbr_py from https://github.com/intdxdt/mbr_py
-from mbr_py import MBR
+from mbr import MBR
 
 rtree_path = os.path.join(os.path.dirname(__file__), '../')
 sys.path.append(rtree_path)
 
 import unittest
 
-from _rtree import RTree
+from rtree import RTree
 
 
 def bbox(o):
