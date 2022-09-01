@@ -54,7 +54,7 @@ class MBR(object):
 
     def __iter__(self):
         """
-        interable
+        iterable
         :return: iter
         """
         return iter((self.minx, self.miny, self.maxx, self.maxy))
@@ -343,13 +343,13 @@ class MBR(object):
         """
         dx, dy = 0.0, 0.0
 
-        # find closest edge by x
+        # find the closest edge by x
         if self[x2] < other[x1]:
             dx = other[x1] - self[x2]
         elif self[x1] > other[x2]:
             dx = self[x1] - other[x2]
 
-        # find closest edge by y
+        # find the closest edge by y
         if self[y2] < other[y1]:
             dy = other[y1] - self[y2]
         elif self[y1] > other[y2]:

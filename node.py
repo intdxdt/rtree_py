@@ -35,7 +35,6 @@ class Node(dict):
         # only gets called if key is missing
         if item not in self.__dict__:
             raise Exception("invalid attribute")
-        # return getattr(self, item)
 
     def __lt__(self, other):
         return 0
